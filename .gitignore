@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Allow .ps1 and .md files in the root directory
+!.gitignore
+!LICENSE
+!/*.ps1
+!/*.md
