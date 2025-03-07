@@ -45,15 +45,18 @@ if (-not $FilePath) {
   exit
 }
 
+# Resolve relative path to full path
+$FullPath = Resolve-Path $FilePath
+
 # Check if the file exists
-if (-Not (Test-Path $FilePath)) {
-  Write-Host "The specified file does not exist: $FilePath"
+if (-Not (Test-Path $FullPath)) {
+  Write-Host "The specified file does not exist: $FullPath"
   exit 1
 }
 
 # Get base name if a custom base name is not provided
 if (-not $CustomBaseName) {
-  $FileInfo = Get-Item $FilePath
+  $FileInfo = Get-Item $FullPath
   $CustomBaseName = [System.IO.Path]::GetFileNameWithoutExtension($FileInfo.Name)
 }
 
@@ -72,7 +75,7 @@ $MD5GIANTS = [System.Security.Cryptography.MD5]::Create()
 # Read the file in chunks and compute the hash
 $BufferSize = 4096
 $buffer = New-Object byte[] $BufferSize
-$stream = [System.IO.File]::OpenRead($FilePath)
+$stream = [System.IO.File]::OpenRead($FullPath)
 
 # Initialize a byte count variable
 $totalBytesRead = 0
