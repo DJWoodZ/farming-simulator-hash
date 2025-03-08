@@ -53,12 +53,12 @@ if (-not $FilePath) {
 }
 
 # Resolve relative path to full path
-$FullPath = Resolve-Path $FilePath
+$FullPath = Resolve-Path $FilePath -ErrorAction SilentlyContinue
 
-# Check if the file exists
-if (-Not (Test-Path $FullPath)) {
-  Write-Host "The specified file does not exist: $FullPath"
-  exit 1
+# Check if the full path is null or the file does not exist
+if (-Not $FullPath -or -Not (Test-Path $FullPath)) {
+    Write-Host "The specified file does not exist or could not be resolved: $FilePath"
+    exit 1
 }
 
 # Get base name if a custom base name is not provided
