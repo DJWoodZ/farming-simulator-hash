@@ -18,6 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Farming Simulator Hash (getFileMD5)
+#
+# This PowerShell script outputs the hash of a given file using the same
+# algorithm as the GIANTS getFileMD5() function.
+#
+# https://github.com/DJWoodZ/farming-simulator-hash
+
 param (
   [string]$FilePath,
   [string]$CustomBaseName,
