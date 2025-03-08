@@ -67,32 +67,36 @@ if (-not $CustomBaseName) {
   $CustomBaseName = [System.IO.Path]::GetFileNameWithoutExtension($FileInfo.Name)
 }
 
-# Debug output for base name
-if ($Debug) {
-  Write-Host "Base Name    : '$CustomBaseName'"
-}
-
 # Convert the base name to bytes using UTF-8 encoding
 $BaseNameBytes = [System.Text.Encoding]::UTF8.GetBytes($CustomBaseName)
 
-# Create the MD5 hash objects
-$MD5File = [System.Security.Cryptography.MD5]::Create()
+# Create the MD5 hash object
 $MD5GIANTS = [System.Security.Cryptography.MD5]::Create()
+
+if ($Debug) {
+  $MD5File = [System.Security.Cryptography.MD5]::Create()
+
+  # Initialize a byte count variable
+  $totalBytesRead = 0
+
+  # Debug output for base name
+  Write-Host "Base Name    : '$CustomBaseName'"
+}
 
 # Read the file in chunks and compute the hash
 $BufferSize = 4096
 $buffer = New-Object byte[] $BufferSize
 $stream = [System.IO.File]::OpenRead($FullPath)
 
-# Initialize a byte count variable
-$totalBytesRead = 0
-
 try {
   while (($readCount = $stream.Read($buffer, 0, $BufferSize)) -gt 0) {
-    $MD5File.TransformBlock($buffer, 0, $readCount, $null, 0) > $null
     $MD5GIANTS.TransformBlock($buffer, 0, $readCount, $null, 0) > $null
-    # Accumulate the byte count
-    $totalBytesRead += $readCount
+    if ($Debug) {
+      $MD5File.TransformBlock($buffer, 0, $readCount, $null, 0) > $null
+
+      # Accumulate the byte count
+      $totalBytesRead += $readCount
+    }
   }
 }
 catch {
@@ -103,20 +107,21 @@ finally {
   $stream.Close()
 }
 
-# Finalize the hash computations
-$MD5File.TransformFinalBlock($buffer, 0, 0) > $null
+# Finalize the hash computation
 $MD5GIANTS.TransformFinalBlock($BaseNameBytes, 0, $BaseNameBytes.Length) > $null
 
-# Convert the byte arrays to hex strings
-$MD5FileHash = -join ($MD5File.Hash | ForEach-Object { "{0:x2}" -f $_ })
+# Convert the byte arrays to hex string
 $MD5GIANTSHash = -join ($MD5GIANTS.Hash | ForEach-Object { "{0:x2}" -f $_ })
 
-# Dispose of the MD5 objects
-$MD5File.Dispose()
+# Dispose of the MD5 object
 $MD5GIANTS.Dispose()
 
 # Output the hash and extra detail based on Debug switch
 if ($Debug) {
+  $MD5File.TransformFinalBlock($buffer, 0, 0) > $null
+  $MD5FileHash = -join ($MD5File.Hash | ForEach-Object { "{0:x2}" -f $_ })
+  $MD5File.Dispose()
+
   Write-Host "File Bytes   : $totalBytesRead"
   Write-Host "MD5 (File)   : $MD5FileHash"
   Write-Host "MD5 (GIANTS) : $MD5GIANTSHash"
