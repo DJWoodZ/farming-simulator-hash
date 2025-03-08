@@ -101,8 +101,8 @@ $MD5File.TransformFinalBlock($buffer, 0, 0) > $null
 $MD5GIANTS.TransformFinalBlock($BaseNameBytes, 0, $BaseNameBytes.Length) > $null
 
 # Convert the byte arrays to hex strings
-$MD5GIANTSHash = -join ($MD5GIANTS.Hash | ForEach-Object { "{0:x2}" -f $_ })
 $MD5FileHash = -join ($MD5File.Hash | ForEach-Object { "{0:x2}" -f $_ })
+$MD5GIANTSHash = -join ($MD5GIANTS.Hash | ForEach-Object { "{0:x2}" -f $_ })
 
 # Dispose of the MD5 objects
 $MD5File.Dispose()
